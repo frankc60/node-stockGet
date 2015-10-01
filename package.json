@@ -1,0 +1,25 @@
+{
+  "name": "webscrapper",
+  "version": "1.0.0",
+  "description": "web scrapper with nodejs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frankc60/webscrapper.git"
+  },
+  "keywords": [
+    "webscrapper"
+  ],
+  "author": "frankc60",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/frankc60/webscrapper/issues"
+  },
+  "homepage": "https://github.com/frankc60/webscrapper#readme",
+  "dependencies": {
+    "cheerio": "^0.19.0"
+  }
+}
