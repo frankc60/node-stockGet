@@ -1,6 +1,10 @@
 var cheerio = require('cheerio');
 var http = require('http');
 
+
+//start timing
+console.time("webrequest");
+
 var req = http.get("http://www.kiwicrowd.co.nz", function(res){
 	console.log(res.statusCode)
 
@@ -10,10 +14,15 @@ var req = http.get("http://www.kiwicrowd.co.nz", function(res){
 
   	res.on('end', function() {
     	console.log('No more data in response.');
+  		
+  		//end timing
+  		console.timeEnd("webrequest");
   	});
 });
 
 req.end();
+
+
 
 
 var html = '<div><ul><li>1</li><li id="mynum">2sadf</li><li>3</li></ul></div>';
