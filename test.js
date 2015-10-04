@@ -1,8 +1,8 @@
 //test.js
 
 var fin = require("./finQuery");
-
-var appl = fin.query("NASDAQ%3AAAPL","all",function(err,data){
+//NASDAQ%3AAAPL
+var appl = fin.query("","all",function(err,data){
 	if(err)
 	{
 		console.log("test.js callback error: " + err);

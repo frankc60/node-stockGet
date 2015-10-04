@@ -19,8 +19,8 @@
 var cheerio = require('cheerio');
 var https = require('https');
 
-var debugMode=0;
-var baseurl="https://www.google.co.uk/finance?q=";
+var debugMode=1;
+var baseurl="https://www.goddogle.co.uk/finance?q=";
 
 //var query = "NASDAQ%3AAAPL";
 
@@ -58,11 +58,9 @@ Fin.prototype.query = function(symbol,attri,callback) {
 			body += htmldata;
 		});
 
-		req.on('error', function(e) {
-		  console.error(e);
-		  callback(e);
-		  return;
-		});
+
+
+
 
 	  	res.on('end', function() {
 			//need statusCode of 200 otherwise we have an issue
@@ -161,6 +159,27 @@ Fin.prototype.query = function(symbol,attri,callback) {
 		});
 	});
 
+		req.on('error', function(e) {
+		  console.error(e);
+		  callback(e);
+		  return;
+		});
+
+
+req.on('socket', function (socket) {
+    socket.setTimeout(3000);  
+    socket.on('timeout', function() {
+        req.abort();
+    });
+});
+
+/*
+req.setTimeout(3000, function(e){
+console.log("safasfsf" + e);
+req.abort();
+*/
+
+//}//);
 
 } //close function
 
