@@ -19,24 +19,25 @@
 var cheerio = require('cheerio');
 var https = require('https');
 
-var debugMode=1;
+var debugMode=0;
 var baseurl="https://www.google.co.uk/finance?q=";
 
 //var query = "NASDAQ%3AAAPL";
 
-
+//debug logging to console
 function dlog(data){
 	if(debugMode==1)
 	{
-		dlog(data);
+		console.log(data);
 	}
+	return;
 }
 
 
 var Fin = function() {};
 
 Fin.prototype.url = function (query,callback) {
-	dlog('url is '+ baseurl + query);
+	dlog('url to query is '+ baseurl + query);
 	callback(baseurl+query);
 	return;
 };
@@ -45,7 +46,7 @@ Fin.prototype.url = function (query,callback) {
 
 Fin.prototype.query = function(symbol,attri,callback) {
 	//start timing
-	console.time("webrequest");
+	//console.time("webrequest");
 
 	dlog("\n-----\nsymbol:"+symbol+"\nattri:"+attri+"\n-----\n");
 
@@ -64,25 +65,41 @@ Fin.prototype.query = function(symbol,attri,callback) {
 		});
 
 	  	res.on('end', function() {
+			//need statusCode of 200 otherwise we have an issue
 			if(res.statusCode !=200)
 			{
 				dlog("error statusCode: " + res.statusCode);
-				callback("error statusCode: " + res.statusCode + "", "");
+				callback(new Error("error statusCode: " + res.statusCode + ""), null);
+				return;
 			}
 
 	    	dlog('No more data in response.');
 	  		
 	  		
 	  		//end timing
-	  		console.timeEnd("webrequest");
+	  		//	console.timeEnd("webrequest");
 
 	  		//manipulate DOM
-			
 			{
 			var $ = cheerio.load(body);
-
+			var stockSymbol= {};
 			if(attri=="all"){
-				
+				var k="";
+				$(body).find('meta[itemprop]').each (function(){
+
+				 	attrib = ($(this).attr('itemprop'));
+				 	valuu = ($(this).attr('content'));
+				 	//valuu = $("meta[itemprop="+attrib+"]").attr("content");
+				 	//k += "\"" +attrib + "\":\""+valuu+"\",";
+				 	stockSymbol[attrib] = valuu;
+
+
+				 });
+   				//k = k.substring(0, k.length - 1);
+   				//k = "{" + k + "}";
+ 				//stockSymbol = JSON.parse(k);
+
+/*
 				var name 				= $("meta[itemprop=name]").attr("content");
 				var tickerSymbol		= $("meta[itemprop=tickerSymbol]").attr("content");
 				var exchange 			= $("meta[itemprop=exchange]").attr("content");
@@ -102,6 +119,7 @@ Fin.prototype.query = function(symbol,attri,callback) {
 				    "priceChangePercent": priceChangePercent,
 				    "quoteTime":quoteTime
 				}
+*/
 				callback(null,stockSymbol);
 				return;
 			}
@@ -109,14 +127,15 @@ Fin.prototype.query = function(symbol,attri,callback) {
 			{
 				if($("meta[itemprop="+attri+"]").attr("content") === undefined)
 				{
-					dlog("error callbacking with error");
-					callback(new Error("no attribute defined."),null);
+					dlog("error "+attri+" not found - callbacking with error");
+					callback(new Error("´"+attri + "´ not found."),null);
 					return;
 				}
 				else
 				{
 					var stockSymbol= {};
 					stockSymbol[attri] = $("meta[itemprop="+attri+"]").attr("content");
+					
 					if(stockSymbol[attri] == ""){
 						dlog("error - "+attri+" doesn´t seem to exist!");
 						callback(new Error(attri + " doesn´t exist"),null);
@@ -125,8 +144,8 @@ Fin.prototype.query = function(symbol,attri,callback) {
 					else
 					{
 
-						dlog("\nx:"+attri+":\t\t\t\"" + $("meta[itemprop="+attri+"]").attr("content") + "\"");
-						dlog("\nZZZZZZ:"+attri+":\t\t\t" + stockSymbol[attri]);
+						//dlog("\nx:"+attri+":\t\t\t\"" + $("meta[itemprop="+attri+"]").attr("content") + "\"");
+						//dlog("\nZZZZZZ:"+attri+":\t\t\t" + stockSymbol[attri]);
 					}
 				}
 				
@@ -135,7 +154,7 @@ Fin.prototype.query = function(symbol,attri,callback) {
 
 				dlog("\n\n");
 
-				callback("",stockSymbol);
+				callback(null,stockSymbol);
 				return;
 				}
 			}
