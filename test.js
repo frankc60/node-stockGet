@@ -34,6 +34,7 @@ var appl = fin.query("NYSE%3AF","price" ,function(err,data){
 	}
 
 });
+
 console.log("call 3rd fin");
 var appl = fin.query("NxxAF","price" ,function(err,data){
 	if(err)
