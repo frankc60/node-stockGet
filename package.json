@@ -1,7 +1,7 @@
 {
-  "name": "webscrapper",
+  "name": "stockGet",
   "version": "1.0.0",
-  "description": "web scrapper with nodejs",
+  "description": "stock data retrieval module",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,17 +9,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/frankc60/webscrapper.git"
+    "url": "git+https://github.com/frankc60/node-stockGet.git"
   },
   "keywords": [
-    "webscrapper"
+    "stockGet"
   ],
   "author": "frankc60 <frankc60@gmail.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/frankc60/webscrapper/issues"
+    "url": "https://github.com/frankc60/node-stockGet/issues"
   },
-  "homepage": "https://github.com/frankc60/webscrapper#readme",
+  "homepage": "https://github.com/frankc60/node-stockGet#readme",
   "dependencies": {
     "cheerio": "^0.19.0",
     "https": "^1.0.0",
