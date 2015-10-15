@@ -1,7 +1,7 @@
 /**
  * Retrieve stock market figures from google finance.
  *
- * @module finQuery
+ * @module stockGet
  *
  * @param  {String} html
  * @return {String}
