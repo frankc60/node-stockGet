@@ -1,7 +1,7 @@
-{
+{ 
   "name": "stockGet",
   "version": "1.0.0",
-  "description": "stock data retrieval module",
+  "description": "stock data retrieval nodejs module",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -14,8 +14,8 @@
   "keywords": [
     "stockGet"
   ],
-  "author": "frankc60 <frankc60@gmail.com>",
-  "license": "ISC",
+  "author": "Frank Clausen <frankc60@gmail.com> (coffeeboat.co.uk)",
+  "license" : "BSD-3-Clause", 
   "bugs": {
     "url": "https://github.com/frankc60/node-stockGet/issues"
   },
