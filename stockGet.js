@@ -6,6 +6,7 @@
  * @param  {String} html
  * @return {String}
  
+
 	name
 	tickerSymbol
 	exchange
@@ -150,16 +151,7 @@ function manDom(htmlbody)
 				return;
 			}
 		}
-		
-	//	var string = JSON.stringify(stockSymbol);
-	//	dlog("\n\nString:"+string);
-
-	//	dlog("\n\n");
-
-	//	callback(null,stockSymbol);
-	//	return;
-	}
-		
+	}	
 } //end function
 //*****************************************************
 
@@ -196,15 +188,7 @@ function manDom(htmlbody)
 	});
 
 
-
-
-
-//	req.setTimeout(1000, function(e){
-//	console.log("timeout: " + e);
-
-//});
-
-req.end();
+	req.end();
 
 
 } //close function
