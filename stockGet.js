@@ -3,8 +3,8 @@
  *
  * @module stockGet
  *
- * @param  {String} html
- * @return {String}
+ * @param  {String} stocksymbol
+ * @return {object}
  
 
 	name
