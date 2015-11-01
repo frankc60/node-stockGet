@@ -35,19 +35,19 @@ function dlog(data){
 }
 
 
-var Fin = function() {};
+var stockGet = function() {};
 
 //***********************************************************************
-Fin.prototype.url = function (query,callback) {
+stockGet.prototype.url = function (query,callback) {
 	dlog('url to query is '+ baseurl + query);
-	callback(baseurl+query);
+	callback(null,baseurl+query);
 	return;
 };
 //***********************************************************************
 
 
 //***********************************************************************
-Fin.prototype.query = function(symbol,attri,callback) {
+stockGet.prototype.query = function(symbol,attri,callback) {
 
 	dlog("\n-----\nsymbol:"+symbol+"\nattri:"+attri+"\n-----\n");
 
@@ -59,7 +59,7 @@ Fin.prototype.query = function(symbol,attri,callback) {
 	//***********************************************
 		res.setTimeout(4500, function(e){
 			console.log("timed out");
-			callback("error");
+			callback(new Error(e),null);
 			return;
 		});
 	//***********************************************
@@ -78,12 +78,6 @@ Fin.prototype.query = function(symbol,attri,callback) {
 			callback(new Error(e),null);
 
 		});
-	//***********************************************
-//		res.on("socket", function (socket) {
-//		  socket.emit("agentRemove");
-//		  socket.emit("end");
-		  
-//		});
 	//***********************************************
 	  	res.on('end', function() {
 			//need statusCode of 200 otherwise we have an issue
@@ -123,10 +117,10 @@ function manDom(htmlbody)
 
 		if($("meta[itemprop="+attri+"]").attr("content") === undefined)
 		{
-			console.log("Error: missing parameters, attribute is " +attri+".");
-			dlog("error ´"+attri+"´ not found - callbacking with error");
+			//console.log("Error: missing parameters, attribute is " +attri+".");
+			//dlog("error ´"+attri+"´ not found - callbacking with error");
 			if(callback){
-				callback(new Error("´"+attri + "´ not found."),null);
+				callback(new Error("Missing Attribute ´"+attri + "´ for Symbol ´" + symbol +"´."),null);
 			}
 			else
 			{
@@ -161,8 +155,8 @@ function manDom(htmlbody)
 	  req.destroy();
 
 	  req.end();
-	  callback(new Error(e),null);
-	  
+	  callback(new Error("ss " + e),null);
+	  return;
 	});
 
 
@@ -194,5 +188,4 @@ function manDom(htmlbody)
 } //close function
 
 
-
-module.exports = new Fin();
+module.exports = new stockGet();

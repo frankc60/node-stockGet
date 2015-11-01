@@ -51,20 +51,6 @@ function domFind(html){
 	var priceChangePercent	= $("meta[itemprop=priceChangePercent]").attr("content");
 	var quoteTime			= $("meta[itemprop=quoteTime]").attr("content");
 
-
-/*
-<meta itemprop="tickerSymbol" content="DAX">
-<meta itemprop="exchange" content="INDEXDB">
-<meta itemprop="exchangeTimezone" content="Europe/Berlin">
-<meta itemprop="price" content="9,550.60">
-<meta itemprop="priceChange" content="+41.35">
-<meta itemprop="priceChangePercent" content="0.43">
-<meta itemprop="quoteTime" content="2015-10-02T17:17:23Z">
-<meta itemprop="dataSource" content="INDEXDB data delayed by 15 mins">
-*/
-
-
-//meta itemprop="name" content="DAX PERFORMANCE-INDEX">
 	console.log("url:" + url);
 	
 	console.log("name:\t\t\t\"" + name + "\"");
@@ -75,5 +61,4 @@ function domFind(html){
 	console.log("priceChange:\t\t"+priceChange);
 	console.log("priceChangePercent:\t"+priceChangePercent);
 	console.log("quoteTime:\t\t"+quoteTime);
-
 }
