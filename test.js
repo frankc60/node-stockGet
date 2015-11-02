@@ -24,7 +24,7 @@ var appl = stockGet.query("NASDAQ%3AAAPL","all" ,function(err,data){
 
 });
 console.log("call 2nd stockGet");
-var appl = stockGet.query("NYSE%3AF","zzzz" ,function(err,data){
+var appl = stockGet.query("NYSE%3AF","price" ,function(err,data){
 	if(err)
 	{
 		console.log("test.js 2nd callback error: " + err);

@@ -17,29 +17,19 @@
 	quoteTime		
 */
 
+//required modules
 var cheerio = require('cheerio');
 var https = require('https');
 
-var debugMode=0;
+
 var baseurl="https://www.google.co.uk/finance?q=";
 
-//var query = "NASDAQ%3AAAPL";
-
-//debug logging to console
-function dlog(data){
-	if(debugMode==1)
-	{
-		console.log(data);
-	}
-	return;
-}
-
+var timeoutProtect;
 
 var stockGet = function() {};
 
 //***********************************************************************
 stockGet.prototype.url = function (query,callback) {
-	dlog('url to query is '+ baseurl + query);
 	callback(null,baseurl+query);
 	return;
 };
@@ -49,26 +39,23 @@ stockGet.prototype.url = function (query,callback) {
 //***********************************************************************
 stockGet.prototype.query = function(symbol,attri,callback) {
 
-	dlog("\n-----\nsymbol:"+symbol+"\nattri:"+attri+"\n-----\n");
-
+	
 	var req = https.request((baseurl+symbol), function(res){
 		
 		var body = "";
 
-		dlog(res.sockets);
-	//***********************************************
+		//***********************************************
 		res.setTimeout(4500, function(e){
 			console.log("timed out");
 			callback(new Error(e),null);
 			return;
 		});
-	//***********************************************
+		//***********************************************
 		res.on('data', function (htmldata) {
 			body += htmldata;
-			dlog("data..");
-
+		
 		});
-	//***********************************************
+		//***********************************************
 		res.on('error', function() {	
 			console.log("sdfasfaf");
 			req.abort();
@@ -78,21 +65,24 @@ stockGet.prototype.query = function(symbol,attri,callback) {
 			callback(new Error(e),null);
 
 		});
-	//***********************************************
+		//***********************************************
 	  	res.on('end', function() {
 			//need statusCode of 200 otherwise we have an issue
 			 //clearTimeout( timeout );
 			if(res.statusCode !=200)
 			{
-				dlog("error statusCode: " + res.statusCode);
-				callback(new Error("error statusCode: " + res.statusCode + ""), null);
-				return;
+				req.end();
+	  			callback(new Error("error statusCode: " + res.statusCode + ""), null);
 			}
 
+// Proceed only if the timeout handler has not yet fired.
+			if (timeoutProtect) {
 
-	    	dlog('No more data in response.');
-	  		
-	  		
+			    // Clear the scheduled timeout handler
+			    clearTimeout(timeoutProtect);
+			}
+
+	  		req.end();
 	  		//manipulate DOM
 			manDom(body);
 		});
@@ -112,8 +102,10 @@ function manDom(htmlbody)
 		callback(null,stockSymbol);
 		return;
 	}
-	else
+	else //just return the one dom value
 	{
+
+//this below if seems to get called with all issues ? need more testing
 
 		if($("meta[itemprop="+attri+"]").attr("content") === undefined)
 		{
@@ -124,6 +116,7 @@ function manDom(htmlbody)
 			}
 			else
 			{
+				console.log("Missing Attribute ´"+attri + "´ for Symbol ´" + symbol +"´.");
 				return;
 			}
 			
@@ -132,31 +125,28 @@ function manDom(htmlbody)
 		{
 			var stockSymbol= {};
 			stockSymbol[attri] = $("meta[itemprop="+attri+"]").attr("content");
-			
-			if(stockSymbol[attri] == ""){
-				dlog("error - "+attri+" doesn´t seem to exist!");
-				callback(new Error(attri + " doesn´t exist"),null);
-				return;
-			}
-			else
-			{
-				//success - pass back data to callback.
-				callback(null,stockSymbol);
-				return;
-			}
+
+			//success - pass back data to callback.
+			callback(null,stockSymbol);
+			return;
 		}
 	}	
 } //end function
 //*****************************************************
 
-	req.on('error', function(e) {
-	  //console.error(e);
-	  req.abort();
-	  req.destroy();
 
-	  req.end();
-	  callback(new Error("ss " + e),null);
-	  return;
+
+
+
+	req.on('error', function(e) {
+	  	//console.error(e);
+	  	console.log("error req on");
+	  	req.abort();
+	  	req.destroy();
+		req.end();
+	  
+	  	callback(new Error("ss " + e),null);
+	  	return;
 	});
 
 
@@ -165,6 +155,8 @@ function manDom(htmlbody)
 	  // (i.e. doesn't send any response or it took to long).
 	  // You don't know what happend.
 	  // It will emit 'error' message as well (with ECONNRESET code).
+
+	  console.log("timeout req on");
 	  
 	  console.log('timeout');
 	  req.abort();
@@ -174,11 +166,21 @@ function manDom(htmlbody)
 	});
 
 	req.on("socket", function (socket) {
-	  dlog("socket start");
 	//  socket.emit("agentRemove");
 	 // socket.emit("close");
+console.log("sockets req on");
 
-	  
+// Setup the timeout handler
+timeoutProtect = setTimeout(function() {
+  	// Clear the local timer variable, indicating the timeout has been triggered.
+  	timeoutProtect = null;
+ 	
+
+  // Execute the callback with an error argument.
+
+    throw new Error("socket timeoutzz");
+}, 1500);
+
 	});
 
 
