@@ -166,20 +166,19 @@ function manDom(htmlbody)
 	});
 
 	req.on("socket", function (socket) {
-	//  socket.emit("agentRemove");
-	 // socket.emit("close");
-console.log("sockets req on");
+		//  socket.emit("agentRemove");
+		// socket.emit("close");
+		console.log("sockets req on");
+		throw new Error("ererer");
+		// Setup the timeout handler
+		timeoutProtect = setTimeout(function() {
+			// Clear the local timer variable, indicating the timeout has been triggered.
+			timeoutProtect = null;
 
-// Setup the timeout handler
-timeoutProtect = setTimeout(function() {
-  	// Clear the local timer variable, indicating the timeout has been triggered.
-  	timeoutProtect = null;
- 	
-
-  // Execute the callback with an error argument.
-
-    throw new Error("socket timeoutzz");
-}, 1500);
+			var err = new Error('example');
+			throw err;
+			// Execute the callback with an error argument.
+		}, 1500);
 
 	});
 
