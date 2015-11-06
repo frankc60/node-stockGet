@@ -57,7 +57,7 @@ stockGet.prototype.query = function(symbol,attri,callback) {
 		});
 		//***********************************************
 		res.on('error', function() {	
-			console.log("sdfasfaf");
+			console.log("res.on('error', ");
 			req.abort();
 			req.destroy();
 
@@ -77,7 +77,7 @@ stockGet.prototype.query = function(symbol,attri,callback) {
 
 // Proceed only if the timeout handler has not yet fired.
 			if (timeoutProtect) {
-
+				timeoutProtect = null;
 			    // Clear the scheduled timeout handler
 			    clearTimeout(timeoutProtect);
 			}
@@ -162,6 +162,8 @@ function manDom(htmlbody)
 	  req.abort();
 	  req.destroy();
 	  req.end();
+	  req.emit('error');
+
 	  //req.finish();
 	});
 
@@ -169,14 +171,16 @@ function manDom(htmlbody)
 		//  socket.emit("agentRemove");
 		// socket.emit("close");
 		console.log("sockets req on");
-		throw new Error("ererer");
+		//throw new Error("ererer");
 		// Setup the timeout handler
 		timeoutProtect = setTimeout(function() {
 			// Clear the local timer variable, indicating the timeout has been triggered.
 			timeoutProtect = null;
 
-			var err = new Error('example');
-			throw err;
+			//var err = new Error('example');
+req.emit('timeout');
+
+			//throw err;
 			// Execute the callback with an error argument.
 		}, 1500);
 
