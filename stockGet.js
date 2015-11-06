@@ -76,11 +76,13 @@ stockGet.prototype.query = function(symbol,attri,callback) {
 			}
 
 // Proceed only if the timeout handler has not yet fired.
-			if (timeoutProtect) {
+			//if (timeoutProtect) {
 				timeoutProtect = null;
 			    // Clear the scheduled timeout handler
 			    clearTimeout(timeoutProtect);
-			}
+			    console.log("clear timeout");
+		//	}
+	
 
 	  		req.end();
 	  		//manipulate DOM
@@ -140,12 +142,18 @@ function manDom(htmlbody)
 
 	req.on('error', function(e) {
 	  	//console.error(e);
-	  	console.log("error req on");
+	  	console.log("req.on('error' " + symbol);
 	  	req.abort();
 	  	req.destroy();
 		req.end();
 	  
-	  	callback(new Error("ss " + e),null);
+		if (timeoutProtect) {
+			timeoutProtect = null;
+		    // Clear the scheduled timeout handler
+		    clearTimeout(timeoutProtect);
+		}
+
+	  	callback(new Error("ERROR " + e),null);
 	  	return;
 	});
 
@@ -156,33 +164,25 @@ function manDom(htmlbody)
 	  // You don't know what happend.
 	  // It will emit 'error' message as well (with ECONNRESET code).
 
-	  console.log("timeout req on");
+	  console.log("req.on('timeout'");
 	  
-	  console.log('timeout');
+	  //console.log('timeout');
 	  req.abort();
 	  req.destroy();
 	  req.end();
-	  req.emit('error');
+	  req.emit('error', "TIMEOUT");
 
-	  //req.finish();
 	});
 
 	req.on("socket", function (socket) {
-		//  socket.emit("agentRemove");
-		// socket.emit("close");
-		console.log("sockets req on");
-		//throw new Error("ererer");
+		console.log("req.on('socket'");
+	
 		// Setup the timeout handler
 		timeoutProtect = setTimeout(function() {
 			// Clear the local timer variable, indicating the timeout has been triggered.
 			timeoutProtect = null;
-
-			//var err = new Error('example');
-req.emit('timeout');
-
-			//throw err;
-			// Execute the callback with an error argument.
-		}, 1500);
+			req.emit('timeout');
+		}, 4500);
 
 	});
 
