@@ -31,25 +31,16 @@ var stockGet = function() {};
 //***********************************************************************
 stockGet.prototype.url = function (query,callback) {
 	callback(null,baseurl+query);
-	return;
 };
 //***********************************************************************
 
 
 //***********************************************************************
 stockGet.prototype.query = function(symbol,attri,callback) {
-
-	
+	console.time("queryTime");
 	var req = https.request((baseurl+symbol), function(res){
 		
 		var body = "";
-
-		//***********************************************
-		res.setTimeout(4500, function(e){
-			console.log("timed out");
-			callback(new Error(e),null);
-			return;
-		});
 		//***********************************************
 		res.on('data', function (htmldata) {
 			body += htmldata;
@@ -58,40 +49,90 @@ stockGet.prototype.query = function(symbol,attri,callback) {
 		//***********************************************
 		res.on('error', function() {	
 			console.log("res.on('error', ");
-			req.abort();
-			req.destroy();
-
+			clearTimeout(timeoutProtect);
 			req.end();
 			callback(new Error(e),null);
 
 		});
 		//***********************************************
 	  	res.on('end', function() {
+
+			// Clear the scheduled timeout handler
+			    clearTimeout(timeoutProtect);
+			    console.log("clear timeout");
+			    console.log("----------------------");
+
+
 			//need statusCode of 200 otherwise we have an issue
-			 //clearTimeout( timeout );
 			if(res.statusCode !=200)
 			{
 				req.end();
 	  			callback(new Error("error statusCode: " + res.statusCode + ""), null);
 			}
 
-// Proceed only if the timeout handler has not yet fired.
-			//if (timeoutProtect) {
-				timeoutProtect = null;
-			    // Clear the scheduled timeout handler
-			    clearTimeout(timeoutProtect);
-			    console.log("clear timeout");
-		//	}
-	
-
+			
+			//end request
 	  		req.end();
 	  		//manipulate DOM
 			manDom(body);
 		});
+		console.timeEnd("queryTime");
 	});
 
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+
+	req.on('error', function(e) {
+	  	console.log("req.on('error' " + symbol);
+	  	req.end();
+		
+		clearTimeout(timeoutProtect);
+		
+	  	callback(new Error("ERROR " + e),null);
+	});
+
+
+	req.on('timeout', function () {
+	  // Timeout happend. Server received request, but not handled it
+	  // (i.e. doesn't send any response or it took to long).
+	  // You don't know what happend.
+	  // It will emit 'error' message as well (with ECONNRESET code).
+
+	  console.log("req.on('timeout'");
+	  req.emit('error', "TIMEOUT");
+
+	});
+
+
+
+	req.on("socket", function (socket) {
+		console.log("req.on('socket'");
+	
+		if(timeoutProtect){
+		    clearTimeout(timeoutProtect);
+		//    timeoutProtect = null;
+		}
+
+		// Setup the timeout handler
+		timeoutProtect = setTimeout(function() {
+			// Clear the local timer variable, indicating the timeout has been triggered.
+			//timeoutProtect = null;
+			req.emit('timeout');
+		}, 500);
+
+	});
+
+	req.end();
+
+
+//*****************************************************
+//*****************************************************
 function manDom(htmlbody)
 {
+
+console.time("queryTime2");
+
 	var $ = cheerio.load(htmlbody);
 	var stockSymbol= {};
 	if(attri=="all"){
@@ -101,6 +142,8 @@ function manDom(htmlbody)
 		 	valuu = ($(this).attr('content'));
 		 	stockSymbol[attrib] = valuu;
 		 });
+	console.timeEnd("queryTime2");
+	
 		callback(null,stockSymbol);
 		return;
 	}
@@ -113,14 +156,13 @@ function manDom(htmlbody)
 		{
 			//console.log("Error: missing parameters, attribute is " +attri+".");
 			//dlog("error ´"+attri+"´ not found - callbacking with error");
-			if(callback){
-				callback(new Error("Missing Attribute ´"+attri + "´ for Symbol ´" + symbol +"´."),null);
-			}
-			else
-			{
-				console.log("Missing Attribute ´"+attri + "´ for Symbol ´" + symbol +"´.");
-				return;
-			}
+	 //timeoutProtect = null;
+
+			clearTimeout(timeoutProtect);
+   
+   		
+			callback(new Error("Missing Attribute ´"+attri + "´ for Symbol ´" + symbol +"´."),null);
+			
 			
 		}
 		else
@@ -135,62 +177,8 @@ function manDom(htmlbody)
 	}	
 } //end function
 //*****************************************************
-
-
-
-
-
-	req.on('error', function(e) {
-	  	//console.error(e);
-	  	console.log("req.on('error' " + symbol);
-	  	req.abort();
-	  	req.destroy();
-		req.end();
-	  
-		if (timeoutProtect) {
-			timeoutProtect = null;
-		    // Clear the scheduled timeout handler
-		    clearTimeout(timeoutProtect);
-		}
-
-	  	callback(new Error("ERROR " + e),null);
-	  	return;
-	});
-
-
-	req.on('timeout', function () {
-	  // Timeout happend. Server received request, but not handled it
-	  // (i.e. doesn't send any response or it took to long).
-	  // You don't know what happend.
-	  // It will emit 'error' message as well (with ECONNRESET code).
-
-	  console.log("req.on('timeout'");
-	  
-	  //console.log('timeout');
-	  req.abort();
-	  req.destroy();
-	  req.end();
-	  req.emit('error', "TIMEOUT");
-
-	});
-
-	req.on("socket", function (socket) {
-		console.log("req.on('socket'");
-	
-		// Setup the timeout handler
-		timeoutProtect = setTimeout(function() {
-			// Clear the local timer variable, indicating the timeout has been triggered.
-			timeoutProtect = null;
-			req.emit('timeout');
-		}, 4500);
-
-	});
-
-
-	req.end();
-
-
 } //close function
+
 
 
 module.exports = new stockGet();
