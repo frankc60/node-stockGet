@@ -16,6 +16,7 @@
 	priceChangePercent
 	quoteTime		
 */
+"use strict";
 
 //required modules
 var cheerio = require('cheerio');
@@ -25,6 +26,8 @@ var https = require('https');
 var baseurl="https://www.google.co.uk/finance?q=";
 
 var timeoutProtect;
+var res;
+var req;
 
 var stockGet = function() {};
 
@@ -33,50 +36,60 @@ stockGet.prototype.url = function (query,callback) {
 	callback(null,baseurl+query);
 };
 //***********************************************************************
+var testx = function (e) {
+	console.log("test error!!!!!!! " + e);
+
+}
 
 
 //***********************************************************************
 stockGet.prototype.query = function(symbol,attri,callback) {
 	console.time("queryTime");
 	var req = https.request((baseurl+symbol), function(res){
-		
 		var body = "";
+		
+//not used ?? on error??
+		res.on('error', function (e) {
+			console.log("sfasf" + e);
+		
+		});
+		
 		//***********************************************
 		res.on('data', function (htmldata) {
 			body += htmldata;
 		
 		});
 		//***********************************************
-		res.on('error', function() {	
-			console.log("res.on('error', ");
-			clearTimeout(timeoutProtect);
-			req.end();
-			callback(new Error(e),null);
-
-		});
-		//***********************************************
-	  	res.on('end', function() {
+		res.on('end', function() {
+		
+	//	console.log("methods " + res.METHODS);
+			console.timeEnd("queryTime");
+			
+			//console.timeEnd("queryTime");
 
 			// Clear the scheduled timeout handler
-			    clearTimeout(timeoutProtect);
-			    console.log("clear timeout");
-			    console.log("----------------------");
+		//    clearTimeout(timeoutProtect);
+		 //   console.log("clear timeout");
+		    console.log("----------------------");
 
-
+			//end request
+	  		req.end();
+	
 			//need statusCode of 200 otherwise we have an issue
-			if(res.statusCode !=200)
+				if(res.statusCode !=200)
 			{
-				req.end();
 	  			callback(new Error("error statusCode: " + res.statusCode + ""), null);
 			}
 
 			
-			//end request
-	  		req.end();
 	  		//manipulate DOM
 			manDom(body);
 		});
-		console.timeEnd("queryTime");
+	
+
+		//res.setTimeout(function (e) {console.log("sfasf" + e);}, 1000);
+
+
 	});
 
 //**********************************************************************
@@ -87,39 +100,46 @@ stockGet.prototype.query = function(symbol,attri,callback) {
 	  	console.log("req.on('error' " + symbol);
 	  	req.end();
 		
-		clearTimeout(timeoutProtect);
+	//	clearTimeout(timeoutProtect);
 		
 	  	callback(new Error("ERROR " + e),null);
 	});
 
 
-	req.on('timeout', function () {
+//	req.on('timeout', function () {
 	  // Timeout happend. Server received request, but not handled it
 	  // (i.e. doesn't send any response or it took to long).
 	  // You don't know what happend.
 	  // It will emit 'error' message as well (with ECONNRESET code).
 
-	  console.log("req.on('timeout'");
-	  req.emit('error', "TIMEOUT");
+//	  console.log("req.on('timeout'");
+//	  req.emit('error', "TIMEOUT");
 
-	});
+//	});
 
 
 
 	req.on("socket", function (socket) {
 		console.log("req.on('socket'");
 	
-		if(timeoutProtect){
-		    clearTimeout(timeoutProtect);
+	 	socket.setTimeout(285);  
+		    socket.on('timeout', function() {
+		        console.log("socket timeout abort!" + symbol);
+		        req.abort();
+		    }); 
+
+
+//		if(timeoutProtect){
+//		    clearTimeout(timeoutProtect);
 		//    timeoutProtect = null;
-		}
+//		}
 
 		// Setup the timeout handler
-		timeoutProtect = setTimeout(function() {
+//		timeoutProtect = setTimeout(function() {
 			// Clear the local timer variable, indicating the timeout has been triggered.
 			//timeoutProtect = null;
-			req.emit('timeout');
-		}, 500);
+//			req.emit('timeout');
+//		}, 500);
 
 	});
 
@@ -131,18 +151,20 @@ stockGet.prototype.query = function(symbol,attri,callback) {
 function manDom(htmlbody)
 {
 
-console.time("queryTime2");
 
-	var $ = cheerio.load(htmlbody);
-	var stockSymbol= {};
+
+	let $ = cheerio.load(htmlbody);
+	let stockSymbol= {};
 	if(attri=="all"){
-		var k="";
+		let k="";
+		let attrib=""; 
+		let valuu="";
 		$(htmlbody).find('meta[itemprop]').each (function(){
 		 	attrib = ($(this).attr('itemprop'));
 		 	valuu = ($(this).attr('content'));
 		 	stockSymbol[attrib] = valuu;
 		 });
-	console.timeEnd("queryTime2");
+		
 	
 		callback(null,stockSymbol);
 		return;
@@ -158,7 +180,7 @@ console.time("queryTime2");
 			//dlog("error ´"+attri+"´ not found - callbacking with error");
 	 //timeoutProtect = null;
 
-			clearTimeout(timeoutProtect);
+		//	clearTimeout(timeoutProtect);
    
    		
 			callback(new Error("Missing Attribute ´"+attri + "´ for Symbol ´" + symbol +"´."),null);
@@ -167,7 +189,7 @@ console.time("queryTime2");
 		}
 		else
 		{
-			var stockSymbol= {};
+			
 			stockSymbol[attri] = $("meta[itemprop="+attri+"]").attr("content");
 
 			//success - pass back data to callback.
