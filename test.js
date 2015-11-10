@@ -4,58 +4,62 @@
 //by Frank Clausen <frankc60@gmail.com> (coffeeboat.co.uk)
 //
 //
+"use strict";
 var stockGet = require("./stockGet");
 
-//NASDAQ%3AAAPL
-console.log("call 1st stockGet");
-var appl = stockGet.query("NASDAQ%3AAAPL","all" ,function(err,data){
+var queryA = "NASDAQ%3AAAPL";
+var queryB = "NYSE%3AF";
+var queryC = "NxxAF";
+
+
+//**************************************************************************
+//**************************************************************************
+let appl1 = stockGet.query(queryA,"all",function(err,data){
+	console.log("test.js: callback("+queryA+"---------------------------------------");
 	if(err)
 	{
-		console.log("test.js 1st callback error: " + err);
+		console.log("test.js: callback("+queryA+") error: " + err);
 	}
 	else
 	{
-		console.log("\n---------------------------------------\n1st callback in TEST.JS")
-			
 		Object.keys(data).forEach(function(element, key, _array) {
 			console.log("" + element + "=" + data[element]);
 		});
 	}
-
+console.log("\ntest.js: callback("+queryA+")---------------------------------------");
 });
-console.log("call 2nd stockGet");
-var appl = stockGet.query("NYSE%3AF","price" ,function(err,data){
+//**************************************************************************
+//**************************************************************************
+let appl2 = stockGet.query(queryB,"all",function(err,data){
+	console.log("test.js: callback("+queryB+"---------------------------------------");
 	if(err)
 	{
-		console.log("test.js 2nd callback error: " + err);
+		console.log("test.js: callback("+queryB+") error: " + err);
 	}
 	else
 	{
-		console.log("\n---------------------------------------\n2nd callback in TEST.JS")
-			
 		Object.keys(data).forEach(function(element, key, _array) {
 			console.log("" + element + "=" + data[element]);
 		});
 	}
-
+console.log("\ntest.js: callback("+queryB+")---------------------------------------");
 });
-
-console.log("call 3rd stockGet");
-var appl = stockGet.query("NxxAF","price" ,function(err,data){
+//**************************************************************************
+//**************************************************************************
+let appl3 = stockGet.query(queryC,"all",function(err,data){
+	console.log("test.js: callback("+queryC+"---------------------------------------");
 	if(err)
 	{
-		console.log("test.js 3rd callback error: " + err);
+		console.log("test.js: callback("+queryC+") error: " + err);
 	}
 	else
 	{
-		console.log("\n---------------------------------------\n3rd callback in TEST.JS")
-			
 		Object.keys(data).forEach(function(element, key, _array) {
 			console.log("" + element + "=" + data[element]);
 		});
 	}
-
+console.log("\ntest.js: callback("+queryC+")---------------------------------------");
 });
-
-
-console.log("the finish test.js file");
+//**************************************************************************
+//**************************************************************************
+console.log("test.js: the finish test.js file");
