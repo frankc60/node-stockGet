@@ -15,10 +15,10 @@ var queryC = "NxxAF";
 //**************************************************************************
 //**************************************************************************
 let appl1 = stockGet.query(queryA,"all",function(err,data){
-	console.log("test.js: callback("+queryA+"---------------------------------------");
+//	console.log("test.js: callback("+queryA+"---------------------------------------");
 	if(err)
 	{
-		console.log("test.js: callback("+queryA+") error: " + err);
+		console.log("A test.js: callback("+queryA+", " + err + ")");
 	}
 	else
 	{
@@ -26,15 +26,17 @@ let appl1 = stockGet.query(queryA,"all",function(err,data){
 			console.log("" + element + "=" + data[element]);
 		});
 	}
-console.log("\ntest.js: callback("+queryA+")---------------------------------------");
+//console.log("\ntest.js: callback("+queryA+")---------------------------------------");
 });
 //**************************************************************************
+console.log("/////////////////");
 //**************************************************************************
+
 let appl2 = stockGet.query(queryB,"all",function(err,data){
-	console.log("test.js: callback("+queryB+"---------------------------------------");
+	//console.log("test.js: callback("+queryB+"---------------------------------------");
 	if(err)
 	{
-		console.log("test.js: callback("+queryB+") error: " + err);
+		console.log("B test.js: callback("+queryB+", " + err + ")");
 	}
 	else
 	{
@@ -42,15 +44,17 @@ let appl2 = stockGet.query(queryB,"all",function(err,data){
 			console.log("" + element + "=" + data[element]);
 		});
 	}
-console.log("\ntest.js: callback("+queryB+")---------------------------------------");
+//console.log("\ntest.js: callback("+queryB+")---------------------------------------");
 });
 //**************************************************************************
+console.log("/////////////////");
 //**************************************************************************
+/*
 let appl3 = stockGet.query(queryC,"all",function(err,data){
-	console.log("test.js: callback("+queryC+"---------------------------------------");
+	//console.log("test.js: callback("+queryB+"---------------------------------------");
 	if(err)
 	{
-		console.log("test.js: callback("+queryC+") error: " + err);
+		console.log("C test.js: callback("+queryC+", " + err + ")");
 	}
 	else
 	{
@@ -58,8 +62,12 @@ let appl3 = stockGet.query(queryC,"all",function(err,data){
 			console.log("" + element + "=" + data[element]);
 		});
 	}
-console.log("\ntest.js: callback("+queryC+")---------------------------------------");
+//console.log("\ntest.js: callback("+queryB+")---------------------------------------");
 });
+
 //**************************************************************************
+console.log("/////////////////");
 //**************************************************************************
+*/
+
 console.log("test.js: the finish test.js file");

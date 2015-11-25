@@ -19,8 +19,8 @@
 "use strict";
 
 //required modules
-var cheerio = require('cheerio');
-var https = require('https');
+var Cheerio = require('cheerio');
+var Https = require('https');
 
 
 var baseurl="https://www.google.co.uk/finance?q=";
@@ -28,6 +28,7 @@ var baseurl="https://www.google.co.uk/finance?q=";
 var timeoutProtect;
 var res;
 var req;
+var globalError = false;
 
 var stockGet = function() {};
 
@@ -39,63 +40,112 @@ stockGet.prototype.url = function (query,callback) {
 //***********************************************************************
 stockGet.prototype.query = function(symbol,attri,callback) {
 	//console.log("query(" + symbol + ")");
+
+	let mainURL = baseurl+symbol;
+
 	console.time("queryTime");
-	var req = https.request((baseurl+symbol), function(res){
+	var req = Https.request(mainURL, function(res){
 		let body="";
 		//***********************************************
 		res.on('data', function (htmldata) {
 			body += htmldata;
+			//console.log(".");
 		});
 		//***********************************************
 		res.on('end', function() {
+			if(!globalError)
+			{
 			console.log(symbol + ": res.on(´end´)");
 
 			
-			var d = console.timeEnd("queryTime");
-			console.log(symbol + ": " + d);
-		    console.log("----------------------");
-
-			//end request
-	  		req.end();
-	
+			console.timeEnd("queryTime");
+			
 			//need statusCode of 200 otherwise we have an issue
 			if(res.statusCode !=200)
 			{
+				globalError=true;
 	  			callback(new Error("error statusCode: " + res.statusCode + ""), null);
 			}
-			
-	  		//manipulate DOM
+			 
+	  		//manipulate DOM function
 			manDom(body);
+			}
+			else
+			{
+				console.log("********res.end called, but error has happened.");
+
+			}
 		});
 	});
 
 //**********************************************************************
 //**********************************************************************
+	//req.once appears to cause errors somtimes.. so using just req.on("error",...) instead
 	req.on('error', function(e) {
-	  	console.log(symbol + ": req.on('error')");
+	  	console.log(symbol + ": req.on('error') - callback(error)");
 	  	req.abort();
 	  	req.end();
-			
-	  	callback(new Error(e.message),null);
+		//res.removeAllListeners("end");
+		globalError = true;
+		//make sure callback is not called again
+		let newCallback = callback;
+		//callback = null;
+	  	callback("Error: " + e.message,null);
+	});
+
+	req.on("close", function () {
+		console.log("server connection closed.");
+
 	});
 
 	req.on("socket", function (socket) {
-		console.log(symbol + ": req.on('socket'");
+		console.log(symbol + ": req.on('socket')");
 	
-	 	socket.setTimeout(2285);  
-		    socket.on('timeout', function() {
-		        console.log(symbol + ": socket timeout abort");
-		        req.abort();
-		        req.end();
-		    }); 
+	 	socket.setTimeout(111);  
+	    socket.on('timeout', function() {
+	    	socket.destroy();
+	//    	req.abort();
+	  //      req.end();
+	       // console.log(symbol + ": socket timeout abort");
+	        req.emit("error",new Error("Timeout for " + symbol));
+	        	//"error timeout");
+	        req.abort();
+	        req.end();
+	       
+	       
+	    }); 
 	});
-	req.end();
+
+
+	
+req.end();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //*****************************************************
 //*****************************************************
 	function manDom(htmlbody)
 	{
-		let $ = cheerio.load(htmlbody);
+		console.log("manDom()");
+		let $ = Cheerio.load(htmlbody);
 		let stockSymbol= {};
 		if(attri=="all"){
 			let k="";
@@ -109,7 +159,7 @@ stockGet.prototype.query = function(symbol,attri,callback) {
 			
 		
 			callback(null,stockSymbol);
-			return;
+			//return;
 		}
 		else //just return the one dom value
 		{
@@ -124,8 +174,8 @@ stockGet.prototype.query = function(symbol,attri,callback) {
 
 			//	clearTimeout(timeoutProtect);
 	   
-	   		
-				callback(new Error("Missing Attribute ´"+attri + "´ for Symbol ´" + symbol +"´."),null);
+	   		req.emit("error",new Error("Missing Attribute ´"+attri + "´ for Symbol ´" + symbol +"´."));
+				//callback(new Error("Missing Attribute ´"+attri + "´ for Symbol ´" + symbol +"´."),null);
 				
 				
 			}
