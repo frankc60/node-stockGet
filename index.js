@@ -4,7 +4,6 @@ var https = require('https');
 var query = "NASDAQ%3AAAPL";
 var url="https://www.google.co.uk/finance?q=" + query + "";
 
-
 //start timing
 console.time("webrequest");
 
