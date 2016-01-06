@@ -7,6 +7,7 @@
  * @return {object}
  
 
+
 	name
 	tickerSymbol
 	exchange
@@ -23,7 +24,7 @@ var Cheerio = require('cheerio');
 var Https = require('https');
 
 
-var baseurl="https://www.google.co.uk/finance?q=";
+var baseurl = "https://www.google.co.uk/finance?q=";
 
 var timeoutProtect;
 var res;
